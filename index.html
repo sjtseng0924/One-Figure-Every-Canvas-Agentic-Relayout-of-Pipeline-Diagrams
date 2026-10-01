@@ -28,10 +28,6 @@
   <script defer src="static/js/index.js"></script>
 </head>
 <body>
-  <nav class="page-nav" aria-label="Sections">
-    <a href="#teaser" class="nav-brand">One Figure, Every Canvas</a>
-    <div><a href="#abstract">Overview</a><a href="#method">Method</a><a href="#quantitative">Results</a><a href="#ablation">Ablation</a><a href="#qwen">Qwen</a><a href="#style-transfer">Style Transfer</a></div>
-  </nav>
   <button class="scroll-to-top" type="button" onclick="scrollToTop()" aria-label="Scroll to top">
     <i class="fas fa-chevron-up"></i>
   </button>
@@ -53,9 +49,6 @@
         <a class="pill-button" href="#" target="_blank" rel="noopener">
           <i class="fab fa-github"></i><span>GitHub</span>
         </a>
-        <a class="pill-button" href="#results">
-          <i class="fas fa-images"></i><span>Results</span>
-        </a>
       </div>
     </div>
   </header>
@@ -66,12 +59,13 @@
         <h2>One Figure, Multiple Aspect Ratios</h2>
         <p>A single reference diagram, rearranged for landscape, square, and portrait canvases.</p>
       </div>
-      <div class="teaser-controls">
+      <div class="teaser-carousel">
         <button type="button" class="icon-button" id="teaserPrev" title="Previous example" aria-label="Previous example"><i class="fas fa-chevron-left"></i></button>
-        <div class="teaser-tabs" id="teaserTabs" role="tablist" aria-label="Teaser examples"></div>
+        <div class="teaser-viewport" id="teaserViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Diagram relayout examples"><div class="teaser-track" id="teaserGrid"></div></div>
         <button type="button" class="icon-button" id="teaserNext" title="Next example" aria-label="Next example"><i class="fas fa-chevron-right"></i></button>
       </div>
-      <div class="teaser-grid" id="teaserGrid"></div>
+      <div class="teaser-dots" id="teaserTabs" aria-label="Teaser examples"></div>
+      <p class="teaser-caption" id="teaserCaption" aria-live="polite"></p>
     </section>
 
     <section class="section-block paper-summary band-muted" id="abstract">
@@ -95,7 +89,7 @@
 
     <section class="section-block band-muted" id="method">
       <p class="section-number">02 / METHOD</p>
-      <h2>Parse. Style. Layout.</h2>
+      <h2>Method Overview</h2>
       <p class="section-intro">Three stages transform a raster flowchart into an editable diagram for a new canvas. Each agent works with a critic to verify structure, visual appearance, and layout.</p>
       <figure class="method-figure">
         <button class="image-zoom" type="button" title="Enlarge pipeline overview"><img src="static/images/method/overview.png" alt="Agentic pipeline: SAM 3-assisted Parse, deterministic color extraction and Style, and graph-preserving Layout, each paired with a critic." loading="lazy"></button>
@@ -167,7 +161,7 @@
 
     <section class="section-block" id="ablation">
       <p class="section-number">05 / ABLATION STUDY</p>
-      <h2>What Makes the Pipeline Work?</h2>
+      <h2>Ablation Result</h2>
       <p class="section-intro">A complexity-balanced subset of 30 flowcharts: 10 easy, 10 medium, and 10 hard. We examine stage decomposition, critic feedback, style reconstruction, and conventional graph layout.</p>
       <div id="ablationTable"></div>
       <div class="study-gallery">
@@ -178,28 +172,16 @@
       </div>
     </section>
 
-    <section class="section-block band-muted" id="qwen">
-      <p class="section-number">06 / OPEN-WEIGHT TRANSFER</p>
-      <h2>The Same Pipeline, with Qwen</h2>
-      <p class="section-intro">Replacing Gemini 3.1 Pro Preview with Qwen3.6-27B keeps the Parse&ndash;Style&ndash;Layout pipeline unchanged. Content Fidelity improves from 0.0% to 20.0% over direct XML generation, and XML-format failures drop from 16.0% to 0.0%.</p>
-      <div id="qwenTable"></div>
-      <div class="study-gallery">
-        <h3>Open-weight model comparison</h3>
-        <p class="gallery-description">A 1:1 target canvas. Direct image editing largely retains the elongated source layout and introduces artifacts; the agentic pipeline produces an editable relayout.</p>
-        <div class="figure-comparison four-columns" id="qwenGallery"></div>
-      </div>
-    </section>
-
-    <section class="section-block" id="style-transfer">
-      <p class="section-number">07 / OPTIONAL EXTENSION</p>
-      <h2>A New Style, the Same Diagram</h2>
+    <section class="section-block band-muted" id="style-transfer">
+      <p class="section-number">06 / OPTIONAL EXTENSION</p>
+      <h2>Style Transfer Result</h2>
       <p class="section-intro">An additional reference-guided Style Transfer stage restyles a completed relayout using an unrelated reference image. Colors, typography, corners, and arrows change while diagram structure and semantic content remain intact.</p>
       <div class="choice-tabs" id="styleTabs" aria-label="Style transfer examples"></div>
-      <div class="figure-comparison style-gallery" id="styleGallery"></div>
+      <div class="style-gallery" id="styleGallery"></div>
       <p class="figure-caption">Original diagram + style reference &rarr; restyled, draw.io-editable output.</p>
     </section>
 
-    <section class="section-block bibtex-block band-muted" id="bibtex">
+    <section class="section-block bibtex-block" id="bibtex">
       <div class="bibtex-header">
         <div>
           <h2>BibTeX</h2>

@@ -157,78 +157,89 @@ function originalPaths(caseId) {
 function renderTeasers() {
   const grid = document.getElementById("teaserGrid");
   if (!grid) return;
-  const item = TEASERS[currentTeaser];
   const tabs = document.getElementById("teaserTabs");
+  grid.replaceChildren();
   tabs.innerHTML = "";
   TEASERS.forEach((example, index) => {
+    const slide = document.createElement("article");
+    slide.className = "teaser-slide";
+    slide.id = `teaserSlide${index}`;
+    slide.setAttribute("aria-label", `Example ${index + 1}: ${example.title}`);
+    slide.setAttribute("aria-roledescription", "slide");
+    const composition = document.createElement("div");
+    composition.className = "teaser-composition";
+    const reference = document.createElement("div");
+    reference.className = "teaser-reference";
+    reference.appendChild(createTeaserFigure(example, "Reference", example.ref));
+    reference.appendChild(createTeaserFigure(example, `Ours / ${example.outputs[0][0]}`, example.outputs[0][1]));
+    composition.appendChild(reference);
+    const outputs = document.createElement("div");
+    outputs.className = "teaser-outputs";
+    example.outputs.slice(1).forEach(([ratio, file]) => {
+      const figure = createTeaserFigure(example, `Ours / ${ratio}`, file);
+      figure.dataset.ratio = ratio;
+      outputs.appendChild(figure);
+    });
+    composition.appendChild(outputs);
+    slide.appendChild(composition);
+    grid.appendChild(slide);
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `teaser-tab${index === currentTeaser ? " active" : ""}`;
-    button.textContent = `Example ${index + 1}`;
-    button.title = example.title;
-    button.setAttribute("role", "tab");
-    button.setAttribute("aria-selected", String(index === currentTeaser));
-    button.setAttribute("aria-controls", "teaserGrid");
-    button.tabIndex = index === currentTeaser ? 0 : -1;
+    button.className = "teaser-dot";
+    button.title = `Example ${index + 1}: ${example.title}`;
+    button.setAttribute("aria-label", button.title);
+    button.setAttribute("aria-controls", slide.id);
     button.addEventListener("click", () => selectTeaser(index));
-    button.addEventListener("keydown", (event) => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      const next = event.key === "Home" ? 0 : event.key === "End" ? TEASERS.length - 1 :
-        (index + (event.key === "ArrowRight" ? 1 : -1) + TEASERS.length) % TEASERS.length;
-      selectTeaser(next);
-      tabs.children[next].focus();
-    });
     tabs.appendChild(button);
   });
-  grid.setAttribute("role", "tabpanel");
-  grid.setAttribute("aria-label", item.title);
-  grid.innerHTML = "";
-  const images = [["Reference", item.ref], ...item.outputs.map(([ratio, file]) => [`Ours · ${ratio}`, file])];
-  [images.slice(0, 3), images.slice(3)].forEach((entries) => {
-    const row = document.createElement("div");
-    row.className = "teaser-row";
-    entries.forEach(([label, file]) => {
-      const figure = document.createElement("figure");
-      figure.className = "teaser-figure";
-      figure.innerHTML = `<figcaption>${label}</figcaption><img src="${teaserPath(item, file)}" alt="${item.title}: ${label}" decoding="async">`;
-      row.appendChild(figure);
-    });
-    grid.appendChild(row);
+  const viewport = document.getElementById("teaserViewport");
+  viewport.addEventListener("scroll", () => {
+    const index = Math.round(viewport.scrollLeft / viewport.clientWidth);
+    if (index !== currentTeaser) {
+      currentTeaser = index;
+      updateTeaserControls();
+    }
+  }, { passive: true });
+  viewport.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    selectTeaser(event.key === "Home" ? 0 : event.key === "End" ? TEASERS.length - 1 :
+      currentTeaser + (event.key === "ArrowRight" ? 1 : -1));
   });
-  const caption = document.createElement("p");
-  caption.className = "teaser-caption";
-  caption.innerHTML = `<strong>${item.title}.</strong> The same diagram structure, adapted to five target aspect ratios.`;
-  grid.appendChild(caption);
-  grid.querySelectorAll("img").forEach((img) => {
-    img.addEventListener("load", fitTeaserImages);
-  });
-  fitTeaserImages();
+  updateTeaserControls();
 }
 
-function fitTeaserImages() {
-  const grid = document.getElementById("teaserGrid");
-  const images = [...grid.querySelectorAll("img")];
-  if (!images.length || images.some((img) => !img.naturalWidth)) return;
-  const width = grid.clientWidth;
-  const mobile = window.innerWidth <= 480;
-  const gap = window.innerWidth <= 800 ? 10 : 18;
-  const maxHeight = mobile ? 100 : window.innerWidth <= 800 ? 120 : 166;
-  const rowRatios = [...grid.querySelectorAll(".teaser-row")].map((row) =>
-    [...row.querySelectorAll("img")].reduce((sum, img) => sum + img.naturalWidth / img.naturalHeight, 0)
-  );
-  const height = Math.min(maxHeight, mobile
-    ? (width - 2) / Math.max(...images.map((img) => img.naturalWidth / img.naturalHeight))
-    : (width - 2 * gap - 6) / Math.max(...rowRatios));
-  images.forEach((img) => {
-    img.style.height = `${height}px`;
-    img.style.width = `${height * img.naturalWidth / img.naturalHeight}px`;
+function createTeaserFigure(item, label, file) {
+  const figure = document.createElement("figure");
+  figure.className = "teaser-figure";
+  figure.innerHTML = `<figcaption>${label}</figcaption><button class="image-zoom" type="button" title="Enlarge ${label}" aria-haspopup="dialog"><img src="${teaserPath(item, file)}" alt="${item.title}: ${label}" decoding="async"></button>`;
+  const img = figure.querySelector("img");
+  const updateSize = () => img.style.setProperty("--natural-ratio", img.naturalWidth / img.naturalHeight);
+  img.addEventListener("load", updateSize);
+  if (img.complete && img.naturalWidth) updateSize();
+  return figure;
+}
+
+function updateTeaserControls() {
+  const item = TEASERS[currentTeaser];
+  document.querySelectorAll(".teaser-dot").forEach((button, index) => {
+    button.classList.toggle("active", index === currentTeaser);
+    button.setAttribute("aria-pressed", String(index === currentTeaser));
   });
+  document.querySelectorAll(".teaser-slide").forEach((slide, index) => {
+    slide.inert = index !== currentTeaser;
+  });
+  document.getElementById("teaserCaption").innerHTML = `<strong>${item.title}.</strong> The same diagram, adapted to five target aspect ratios.`;
 }
 
 function selectTeaser(index) {
   currentTeaser = (index + TEASERS.length) % TEASERS.length;
-  renderTeasers();
+  const viewport = document.getElementById("teaserViewport");
+  viewport.scrollTo({
+    left: viewport.clientWidth * currentTeaser,
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"
+  });
+  updateTeaserControls();
 }
 
 function createRatioCard(label, src, hoverSrc = "", special = false) {
@@ -238,7 +249,17 @@ function createRatioCard(label, src, hoverSrc = "", special = false) {
   const holder = document.createElement("div");
   holder.className = "image-holder";
   const loaded = imageWithFallback([src], "result-image", `${label} result`);
-  holder.append(...loaded.wrapper.childNodes);
+  if (hoverSrc) {
+    holder.append(...loaded.wrapper.childNodes);
+  } else {
+    const zoom = document.createElement("button");
+    zoom.className = "image-zoom";
+    zoom.type = "button";
+    zoom.title = `Enlarge ${label} result`;
+    zoom.setAttribute("aria-haspopup", "dialog");
+    zoom.append(...loaded.wrapper.childNodes);
+    holder.appendChild(zoom);
+  }
   if (hoverSrc) {
     const hint = document.createElement("span");
     hint.className = "comparison-hint";
@@ -420,16 +441,6 @@ const RESEARCH_TABLES = {
       ["w/ Graphviz (DOT) Layout", [43.3, 36.7, 20.0, 6.77, 9.67, 35.19]],
       ["Ours", [76.7, 96.7, 76.7, 3.90, 1.73, 87.04]]
     ]
-  },
-  qwen: {
-    title: "Transfer to an open-weight VLM",
-    note: "Qwen3.6-27B replaces Gemini while the pipeline remains unchanged. XML Fail. and correctness are percentages; Layout and Style are average ranks. Overall is computed within this three-method comparison and is not comparable with other tables.",
-    xml: true,
-    rows: [
-      ["Direct VLM-to-XML (Qwen3.6-27B)", [16.0, 8.0, 12.0, 0.0, 2.36, 2.28, 38.0]],
-      ["Direct I2I (Qwen-Image-Edit-2511)", [0.0, 24.0, 8.0, 8.0, 2.16, 2.20, 40.0]],
-      ["Ours (Qwen3.6-27B)", [0.0, 20.0, 52.0, 20.0, 1.40, 1.44, 90.0]]
-    ]
   }
 };
 
@@ -534,23 +545,40 @@ function renderAblation(id = ABLATIONS[0].id) {
 
 function renderStyleTransfer(id = "case1") {
   renderChoices("styleTabs", [{ id: "case1", label: "Example 1" }, { id: "case2", label: "Example 2" }], id, renderStyleTransfer);
-  renderFigureComparison("styleGallery", [
-    ["Original Diagram", `static/images/style_transfer/${id}_original.png`],
-    ["Style Reference", `static/images/style_transfer/${id}_style_ref.png`],
-    ["Ours / Style Transfer", `static/images/style_transfer/${id}_style_transferred.${id === "case1" ? "jpg" : "png"}`]
-  ]);
+  const original = `static/images/style_transfer/${id}_original.png`;
+  const transferred = `static/images/style_transfer/${id}_style_transferred.${id === "case1" ? "jpg" : "png"}`;
+  const gallery = document.getElementById("styleGallery");
+  gallery.innerHTML = `
+    <figure class="style-reference comparison-figure">
+      <figcaption>Style Reference</figcaption>
+      <button class="image-zoom" type="button" title="Enlarge style reference" aria-haspopup="dialog"><img src="static/images/style_transfer/${id}_style_ref.png" alt="Example ${id.slice(-1)} style reference" loading="lazy"></button>
+    </figure>
+    <figure class="style-comparison">
+      <figcaption>Original / Style Transfer</figcaption>
+      <div class="before-after" style="--reveal: 50%; --image-ratio: ${id === "case1" ? 402 / 602 : 1361 / 444}">
+        <img class="before-image" src="${original}" alt="Original diagram" draggable="false">
+        <img class="after-image" src="${transferred}" alt="Style-transferred diagram" draggable="false">
+        <span class="compare-label label-before">Original</span>
+        <span class="compare-label label-after">Transferred</span>
+        <div class="compare-divider" aria-hidden="true"><span><i class="fas fa-arrows-alt-h"></i></span></div>
+        <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Reveal transferred style" aria-valuetext="50% transferred">
+      </div>
+      <div class="compare-endpoints"><span>Original</span><span>Style Transfer</span></div>
+    </figure>
+  `;
+  const range = gallery.querySelector(".compare-range");
+  range.addEventListener("input", () => {
+    gallery.querySelector(".before-after").style.setProperty("--reveal", `${range.value}%`);
+    range.setAttribute("aria-valuetext", `${range.value}% transferred`);
+    gallery.querySelector(".label-after").hidden = Number(range.value) < 10;
+    gallery.querySelector(".label-before").hidden = Number(range.value) > 90;
+  });
 }
 
 function setupResearchSections() {
   Object.entries(RESEARCH_TABLES).forEach(([key, config]) => renderResearchTable(`${key}Table`, config));
   renderAblation();
   renderStyleTransfer();
-  renderFigureComparison("qwenGallery", [
-    ["Original / Target 1:1", "static/images/opensource_result/Qwen/original.jpeg"],
-    ["Direct XML / Qwen3.6-27B", "static/images/opensource_result/Qwen/general-qwen.png"],
-    ["Qwen-Image-Edit-2511", "static/images/opensource_result/Qwen/qwen-image-edit.png"],
-    ["Ours / Qwen3.6-27B", "static/images/opensource_result/Qwen/ours.png"]
-  ]);
   const dialog = document.getElementById("figureDialog");
   document.addEventListener("click", (event) => {
     const button = event.target.closest(".image-zoom");
@@ -588,5 +616,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setupBaselineSelect();
   renderExplorer();
   setupResearchSections();
-  new ResizeObserver(fitTeaserImages).observe(document.getElementById("teaserGrid"));
+  let teaserWidth = document.getElementById("teaserViewport").clientWidth;
+  new ResizeObserver(() => {
+    const viewport = document.getElementById("teaserViewport");
+    if (viewport.clientWidth === teaserWidth) return;
+    teaserWidth = viewport.clientWidth;
+    viewport.scrollTo({ left: teaserWidth * currentTeaser, behavior: "instant" });
+  }).observe(document.getElementById("teaserViewport"));
 });
