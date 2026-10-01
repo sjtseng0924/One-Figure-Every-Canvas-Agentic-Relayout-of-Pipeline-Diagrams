@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="title" content="One Figure, Every Canvas: Agentic Relayout of Pipeline Diagrams">
+  <meta name="title" content="One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline">
   <meta name="description" content="A project page for agentic, aspect-ratio-adaptive relayout of pipeline diagrams across arbitrary canvases.">
   <meta name="keywords" content="diagram relayout, pipeline diagrams, agentic AI, editable figures, aspect ratio adaptation, computer vision">
   <meta name="author" content="Anonymous Authors">
@@ -13,7 +13,7 @@
   <meta property="og:image" content="static/images/teaser/CVPR2024/ref.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#15181f">
-  <meta name="citation_title" content="One Figure, Every Canvas: Agentic Relayout of Pipeline Diagrams">
+  <meta name="citation_title" content="One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline">
   <meta name="citation_author" content="Anonymous">
   <meta name="citation_publication_date" content="2026">
   <meta name="citation_pdf_url" content="static/pdfs/paper.pdf">
@@ -28,6 +28,10 @@
   <script defer src="static/js/index.js"></script>
 </head>
 <body>
+  <nav class="page-nav" aria-label="Sections">
+    <a href="#teaser" class="nav-brand">One Figure, Every Canvas</a>
+    <div><a href="#abstract">Overview</a><a href="#method">Method</a><a href="#quantitative">Results</a><a href="#ablation">Ablation</a><a href="#qwen">Qwen</a><a href="#style-transfer">Style Transfer</a></div>
+  </nav>
   <button class="scroll-to-top" type="button" onclick="scrollToTop()" aria-label="Scroll to top">
     <i class="fas fa-chevron-up"></i>
   </button>
@@ -35,7 +39,7 @@
   <header class="site-hero">
     <div class="hero-inner">
       <h1>One Figure, Every Canvas</h1>
-      <p class="subtitle">Agentic Relayout of Pipeline Diagrams</p>
+      <p class="subtitle">Editable Flowchart Relayout via Agentic Pipeline</p>
       <div class="authors">
         <span>Anonymous Authors</span>
       </div>
@@ -70,14 +74,12 @@
       <div class="teaser-grid" id="teaserGrid"></div>
     </section>
 
-    <section class="section-block paper-summary" id="abstract">
+    <section class="section-block paper-summary band-muted" id="abstract">
+      <p class="section-number">01 / OVERVIEW</p>
       <h2>Abstract</h2>
         <div class="copy">
           <p>
-            Scientific figures are often designed for a single paper column, slide, poster, or webpage. Reusing the same pipeline diagram in a new canvas usually requires tedious manual editing, and image-based resizing frequently distorts text, breaks relationships, or wastes space. We study the problem of automatically relayouting pipeline diagrams so that one source figure can be adapted to many target aspect ratios while retaining semantic structure and visual readability.
-          </p>
-          <p>
-            Our method uses an agentic relayout pipeline that reasons over diagram components, relationships, and canvas constraints, producing fully editable results rather than flattened screenshots. Across challenging examples, it preserves graph relationships, avoids hallucinated components, and supports standard as well as extreme aspect ratios.
+            Pipeline figures in ML papers must be repurposed across many canvases, including paper columns, 16:9 slides, portrait posters, 1:1 social teasers, 9:16 phone previews. Each format imposes a different aspect ratio on the same computational graph, where any silently broken connection misrepresents the method. We formulate aspect-ratio-adaptive flowchart relayout as a distinct task: given a raster flowchart and a target ratio, produce a structurally faithful, hallucination-free, editable layout. Existing methods fail characteristically: image-to-image models stretch blocks and reject extreme ratios, text-to-image agentic systems hallucinate content, and parse-then-render systems mis-route edges. We propose an agentic pipeline factored into Parse, Style, and Layout stages, each pairing a main agent with a critic that combines deterministic constraint checks with VLM visual feedback so connectivity is explicitly checked and prevented from being silently broken. Outputs are draw.io-editable mxGraph XML. On a curated benchmark of 100 flowcharts at five aspect ratios, evaluated by Gemini 3.1 Pro and validated against human judgments, our method reaches 68.6% Content Fidelity versus 11.2&ndash;41.4% for prior work.
           </p>
         </div>
     </section>
@@ -85,14 +87,32 @@
     <section class="section-block contributions" id="contributions">
       <h2>Contributions</h2>
       <ul class="contribution-list">
-        <li><strong>Canvas-aware relayout.</strong> Transforms pipeline diagrams into landscape, square, portrait, cinema, and tall formats while adapting their composition to the target canvas.</li>
-        <li><strong>Editable outputs.</strong> Produces diagram layouts for downstream editing workflows in papers, posters, and presentations.</li>
-        <li><strong>Baseline comparison.</strong> Evaluates against multimodal and diagram-editing baselines across ten examples, examining relationships, hallucination, and layout quality.</li>
+        <li>We formulate <em>aspect-ratio-adaptive flowchart relayout</em> as a distinct task and propose the first agentic pipeline for it, factored into Parse, Style, and Layout stages, each guarded by a critic combining VLM reasoning with deterministic verification so connectivity is explicitly checked and prevented from being silently broken.</li>
+        <li>We construct <strong>FlowchartRelayoutBench</strong>, a benchmark pairing flowcharts from CVPR/ICCV/ECCV/NeurIPS/ICLR/ICML oral papers at five target ratios (9:16, 2:3, 1:1, 3:2, 16:9) with a four-metric VLM-as-a-Judge protocol (Relationship Preservation, Hallucination-free Rate, Layout Quality, Style Similarity) validated against human assessments.</li>
+        <li>Experiments and a user study show that our pipeline substantially outperforms both monolithic VLM and existing agentic figure systems on the structural-fidelity dimensions that matter most for cross-canvas relayout.</li>
       </ul>
     </section>
 
-    <section class="section-block result-explorer" id="results">
+    <section class="section-block band-muted" id="method">
+      <p class="section-number">02 / METHOD</p>
+      <h2>Parse. Style. Layout.</h2>
+      <p class="section-intro">Three stages transform a raster flowchart into an editable diagram for a new canvas. Each agent works with a critic to verify structure, visual appearance, and layout.</p>
+      <figure class="method-figure">
+        <button class="image-zoom" type="button" title="Enlarge pipeline overview"><img src="static/images/method/overview.png" alt="Agentic pipeline: SAM 3-assisted Parse, deterministic color extraction and Style, and graph-preserving Layout, each paired with a critic." loading="lazy"></button>
+        <figcaption>From a raster input at 4:3 to a draw.io-editable output at 16:9. Intermediate representations remain in mxGraph XML.</figcaption>
+      </figure>
+    </section>
+
+    <section class="section-block" id="quantitative">
+      <p class="section-number">03 / BENCHMARK</p>
+      <h2>Faithful Structure, Across Canvases</h2>
+      <p class="section-intro">FlowchartRelayoutBench contains 100 flowcharts evaluated at five target aspect ratios. Content Fidelity requires both correct relationships and no added or omitted elements.</p>
+      <div id="benchmarkTable"></div>
+    </section>
+
+    <section class="section-block result-explorer band-muted" id="results">
       <div class="section-heading compact">
+        <p class="section-number">04 / QUALITATIVE RESULTS</p>
         <h2>Qualitative Comparisons</h2>
         <p>Aspect-ratio adaptation across ten pipeline diagrams, compared with four image-generation and diagram-editing baselines.</p>
       </div>
@@ -103,11 +123,8 @@
             <p class="toolbar-label">Example</p>
             <div class="case-tabs" id="caseTabs"></div>
           </div>
-          <label class="select-wrap">
-            <span>Baseline</span>
-            <select id="baselineSelect"></select>
-          </label>
         </div>
+        <div class="baseline-control"><p class="toolbar-label">Baseline</p><div class="choice-tabs" id="baselineTabs" aria-label="Baseline methods"></div></div>
 
         <div class="case-header">
           <div>
@@ -148,7 +165,41 @@
       </div>
     </section>
 
-    <section class="section-block bibtex-block" id="bibtex">
+    <section class="section-block" id="ablation">
+      <p class="section-number">05 / ABLATION STUDY</p>
+      <h2>What Makes the Pipeline Work?</h2>
+      <p class="section-intro">A complexity-balanced subset of 30 flowcharts: 10 easy, 10 medium, and 10 hard. We examine stage decomposition, critic feedback, style reconstruction, and conventional graph layout.</p>
+      <div id="ablationTable"></div>
+      <div class="study-gallery">
+        <div class="choice-tabs" id="ablationTabs" aria-label="Ablation comparisons"></div>
+        <h3 id="ablationTitle"></h3>
+        <p class="gallery-description" id="ablationDescription"></p>
+        <div class="figure-comparison" id="ablationGallery"></div>
+      </div>
+    </section>
+
+    <section class="section-block band-muted" id="qwen">
+      <p class="section-number">06 / OPEN-WEIGHT TRANSFER</p>
+      <h2>The Same Pipeline, with Qwen</h2>
+      <p class="section-intro">Replacing Gemini 3.1 Pro Preview with Qwen3.6-27B keeps the Parse&ndash;Style&ndash;Layout pipeline unchanged. Content Fidelity improves from 0.0% to 20.0% over direct XML generation, and XML-format failures drop from 16.0% to 0.0%.</p>
+      <div id="qwenTable"></div>
+      <div class="study-gallery">
+        <h3>Open-weight model comparison</h3>
+        <p class="gallery-description">A 1:1 target canvas. Direct image editing largely retains the elongated source layout and introduces artifacts; the agentic pipeline produces an editable relayout.</p>
+        <div class="figure-comparison four-columns" id="qwenGallery"></div>
+      </div>
+    </section>
+
+    <section class="section-block" id="style-transfer">
+      <p class="section-number">07 / OPTIONAL EXTENSION</p>
+      <h2>A New Style, the Same Diagram</h2>
+      <p class="section-intro">An additional reference-guided Style Transfer stage restyles a completed relayout using an unrelated reference image. Colors, typography, corners, and arrows change while diagram structure and semantic content remain intact.</p>
+      <div class="choice-tabs" id="styleTabs" aria-label="Style transfer examples"></div>
+      <div class="figure-comparison style-gallery" id="styleGallery"></div>
+      <p class="figure-caption">Original diagram + style reference &rarr; restyled, draw.io-editable output.</p>
+    </section>
+
+    <section class="section-block bibtex-block band-muted" id="bibtex">
       <div class="bibtex-header">
         <div>
           <h2>BibTeX</h2>
@@ -157,15 +208,17 @@
           <i class="fas fa-copy"></i><span class="copy-text">Copy</span>
         </button>
       </div>
-      <pre id="bibtex-code"><code>@inproceedings{onefigureeverycanvas2026,
-  title={One Figure, Every Canvas: Agentic Relayout of Pipeline Diagrams},
+      <pre id="bibtex-code"><code>@misc{onefigureeverycanvas2026,
+  title={One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline},
   author={Anonymous Authors},
-  booktitle={International Conference on Learning Representations},
-  year={2026},
-  url={https://github.com/}
+  year={2026}
 }</code></pre>
     </section>
   </main>
+  <dialog id="figureDialog" class="figure-dialog" aria-labelledby="figureDialogTitle">
+    <div class="dialog-toolbar"><p id="figureDialogTitle"></p><button id="closeFigure" class="icon-button" type="button" aria-label="Close image" title="Close image"><i class="fas fa-times"></i></button></div>
+    <img id="expandedFigure" alt="">
+  </dialog>
 
   <footer class="footer">
     <p>One Figure, Every Canvas</p>
