@@ -1,80 +1,83 @@
-# Academic Project Page Template
+# One Figure, Every Canvas
 
-> **Update (September 2025)**: This template has been modernized with better design, SEO, and mobile support. For the original version, see the [original-version branch](https://github.com/eliahuhorwitz/Academic-project-page-template/tree/original-version).
+Project page for **One Figure, Every Canvas: Editable Flowchart Relayout via
+Agentic Pipeline**.
 
-A clean, responsive template for academic project pages.
+This is a static HTML/CSS/JavaScript website. No package installation, build
+step, backend, or environment variables are required.
 
+## Deploy to Vercel
 
-Example project pages built using this template are:
-- https://horwitz.ai/probex
-- https://vision.huji.ac.il/probegen
-- https://horwitz.ai/mother
-- https://horwitz.ai/spectral_detuning
-- https://vision.huji.ac.il/ladeda
-- https://vision.huji.ac.il/dsire
-- https://horwitz.ai/podd
-- https://dreamix-video-editing.github.io
-- https://horwitz.ai/conffusion
-- https://horwitz.ai/3d_ads/
-- https://vision.huji.ac.il/ssrl_ad
-- https://vision.huji.ac.il/deepsim
+1. Push this repository, including `static/`, to GitHub.
+2. In Vercel, select **Add New > Project** and import the repository.
+3. Keep **Root Directory** at the repository root (`.`).
+4. Use **Other** as the Framework Preset. `vercel.json` sets the Output
+   Directory to `.`, and leaves the Build and Install Commands empty.
+   Remove any conflicting project-level overrides from an earlier setup.
+5. Select **Deploy** and check the generated preview URL.
 
+Subsequent pushes to the connected production branch redeploy the website.
+The production branch is configured in the Vercel project settings.
 
+Official documentation:
+[static build settings](https://vercel.com/docs/builds/configure-a-build),
+[vercel.json](https://vercel.com/docs/project-configuration/vercel-json), and
+[deployment exclusions](https://vercel.com/docs/deployments/vercel-ignore).
 
-## Start using the template
-To start using the template click on `Use this Template`.
+### Optional CLI Deployment
 
-The template uses html for controlling the content and css for controlling the style. 
-To edit the websites contents edit the `index.html` file. It contains different HTML "building blocks", use whichever ones you need and comment out the rest.  
+From the repository root, run:
 
-**IMPORTANT!** Make sure to replace the `favicon.ico` under `static/images/` with one of your own, otherwise your favicon is going to be a dreambooth image of me.
+```sh
+npx vercel
+```
 
-## What's New
+This creates a preview deployment and prompts you to sign in and link a project.
+Once the preview is checked, publish with:
 
-- Modern, clean design with better mobile support
-- Improved SEO with proper meta tags and structured data
-- Performance improvements (lazy loading, optimized assets)
-- More Works dropdown
-- Copy button for BibTeX citations
-- Better accessibility
+```sh
+npx vercel --prod
+```
 
-## Components
+The local `.vercel/` project association is ignored by Git. Do not commit
+credentials or access tokens.
 
-- Teaser video
-- Image carousel
-- YouTube video embedding
-- Video carousel
-- PDF poster viewer
-- BibTeX citation
+## Before Publishing
 
-## Customization
+- Replace the `href="#"` placeholders for arXiv, Code, and Data in `index.html`.
+- Confirm that `static/pdfs/paper.pdf` is the intended public paper version.
+- Check all result images, carousel arrows, baseline selectors, and style sliders.
+- Keep filename capitalization exact: Vercel paths are case-sensitive.
+- Add absolute social-preview and citation URLs in the HTML metadata once the
+  final public domain is known.
+- Everything in `static/` is public after deployment. Review its contents before
+  publishing; no asset files are excluded by the current configuration.
 
-The HTML file has TODO comments showing what to replace:
+## Project Files
 
-- Paper title, authors, institution, conference
-- Links (arXiv, GitHub, etc.)
-- Abstract and descriptions  
-- Videos, images, and PDFs
-- Related works in the dropdown
-- Meta tags for SEO and social sharing
+| Path | Purpose |
+| --- | --- |
+| `index.html` | Title, authors, links, paper text, and section structure |
+| `static/css/index.css` | Layout and responsive styles |
+| `static/js/index.js` | Result data, carousels, comparisons, and research tables |
+| `static/images/` | Teasers, method figure, results, ablations, and style transfer |
+| `static/pdfs/paper.pdf` | Public paper PDF |
+| `vercel.json` | Static deployment configuration |
+| `.vercelignore` | Excludes local configuration and non-site files from uploads |
 
-### Meta Tags
-The template includes meta tags for better search engine visibility and social media sharing. These appear in the `<head>` section and help with:
-- Google Scholar indexing
-- Social media previews (Twitter, Facebook, LinkedIn)
-- Search engine optimization
+## Local Preview
 
-Create a 1200x630px social preview image at `static/images/social_preview.png`.
-
-## Tips
-
-- Compress images with [TinyPNG](https://tinypng.com)
-- Use YouTube for large videos (>10MB)  
-- Replace the favicon in `static/images/`
-- Works with GitHub Pages
+Open `index.html` in your browser. A development server is not required.
+The static layout is also compatible with GitHub Pages; `.nojekyll` is retained
+for that purpose.
 
 ## Acknowledgments
-Parts of this project page were adopted from the [Nerfies](https://nerfies.github.io/) page.
+
+Based on the
+[Academic Project Page Template](https://github.com/eliahuhorwitz/Academic-project-page-template).
+Parts of the original template were adopted from [Nerfies](https://nerfies.github.io/).
 
 ## Website License
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+
+The website template is licensed under
+[Creative Commons Attribution-ShareAlike 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
