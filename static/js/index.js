@@ -238,11 +238,13 @@ function createRatioCard(label, src, hoverSrc = "", special = false) {
   const card = document.createElement("article");
   card.className = `ratio-card${hoverSrc ? " hover-swap" : ""}${special ? " special" : ""}`;
   card.tabIndex = hoverSrc ? 0 : -1;
+  card.innerHTML = `<h5>${label}</h5>`;
   const holder = document.createElement("div");
   holder.className = "image-holder";
   const loaded = imageWithFallback([src], "result-image", `${label} result`);
   if (hoverSrc) {
-    holder.append(...loaded.wrapper.childNodes);
+    loaded.wrapper.className = "swap-media";
+    holder.appendChild(loaded.wrapper);
   } else {
     const media = document.createElement("div");
     media.className = "figure-media";
@@ -252,17 +254,20 @@ function createRatioCard(label, src, hoverSrc = "", special = false) {
   if (hoverSrc) {
     const hint = document.createElement("span");
     hint.className = "comparison-hint";
+    hint.setAttribute("aria-live", "polite");
     hint.textContent = selectedBaselineLabel();
     card.title = "Compare with Ours";
-    holder.appendChild(hint);
+    loaded.wrapper.appendChild(hint);
     const showOurs = () => {
       loaded.img.src = hoverSrc;
-      hint.textContent = "Viewing Ours";
+      hint.textContent = "Ours";
+      loaded.img.alt = `Ours: ${label} result`;
       hint.classList.add("is-ours");
     };
     const showBaseline = () => {
       loaded.img.src = src;
       hint.textContent = selectedBaselineLabel();
+      loaded.img.alt = `${selectedBaselineLabel()}: ${label} result`;
       hint.classList.remove("is-ours");
     };
     card.addEventListener("mouseenter", showOurs);
@@ -282,7 +287,6 @@ function createRatioCard(label, src, hoverSrc = "", special = false) {
       }
     });
   }
-  card.innerHTML = `<h5>${label}</h5>`;
   card.appendChild(holder);
   return card;
 }

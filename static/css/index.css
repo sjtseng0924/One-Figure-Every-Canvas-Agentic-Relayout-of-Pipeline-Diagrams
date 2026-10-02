@@ -75,6 +75,10 @@ h2 { margin: 0 0 22px; font-size: 29px; line-height: 1.35; font-weight: 600; tex
 .ratio-card.special .image-holder { height: 220px; }
 .hover-swap { cursor: pointer; }
 .comparison-hint { display: none; }
+.swap-media { position: relative; display: inline-flex; max-width: 100%; }
+.hover-swap .image-holder { padding-top: 28px; }
+.swap-media .result-image { max-height: 312px; }
+.comparison-hint.is-ours { display: inline-flex; position: absolute; right: 0; top: -6px; transform: translateY(-100%); align-items: center; height: 22px; padding: 0 8px; background: #171717; color: #fff; border-radius: 3px; font-size: 12px; font-weight: 700; line-height: 1; pointer-events: none; }
 .hover-swap:is(:hover, :focus) .result-image { border-color: var(--accent); }
 .issue-list { margin-top: 10px; font-size: 13px; color: var(--muted); }
 .issue-list ul { padding-left: 18px; margin: 0; }
