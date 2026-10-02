@@ -6,7 +6,7 @@
   <meta name="title" content="One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline">
   <meta name="description" content="A project page for agentic, aspect-ratio-adaptive relayout of pipeline diagrams across arbitrary canvases.">
   <meta name="keywords" content="diagram relayout, pipeline diagrams, agentic AI, editable figures, aspect ratio adaptation, computer vision">
-  <meta name="author" content="Anonymous Authors">
+  <meta name="author" content="Shih-Chen Tseng, Chih-Hsuan Chen, Ryan Yang, Hsi-An Chen, Chun-Wei Tuan Mu, Yu-Lun Liu">
   <meta property="og:type" content="article">
   <meta property="og:title" content="One Figure, Every Canvas">
   <meta property="og:description" content="Agentic relayout of pipeline diagrams for every target canvas.">
@@ -14,7 +14,12 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#15181f">
   <meta name="citation_title" content="One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline">
-  <meta name="citation_author" content="Anonymous">
+  <meta name="citation_author" content="Shih-Chen Tseng">
+  <meta name="citation_author" content="Chih-Hsuan Chen">
+  <meta name="citation_author" content="Ryan Yang">
+  <meta name="citation_author" content="Hsi-An Chen">
+  <meta name="citation_author" content="Chun-Wei Tuan Mu">
+  <meta name="citation_author" content="Yu-Lun Liu">
   <meta name="citation_publication_date" content="2026">
   <meta name="citation_pdf_url" content="static/pdfs/paper.pdf">
   <title>One Figure, Every Canvas | Project Page</title>
@@ -37,7 +42,16 @@
       <h1>One Figure, Every Canvas</h1>
       <p class="subtitle">Editable Flowchart Relayout via Agentic Pipeline</p>
       <div class="authors">
-        <span>Anonymous Authors</span>
+        <span>Shih-Chen Tseng<sup>1</sup>,</span>
+        <span>Chih-Hsuan Chen<sup>1</sup>,</span>
+        <span>Ryan Yang<sup>2</sup>,</span>
+        <span>Hsi-An Chen<sup>1</sup>,</span>
+        <span>Chun-Wei Tuan Mu<sup>1</sup>,</span>
+        <span>Yu-Lun Liu<sup>1</sup></span>
+      </div>
+      <div class="affiliations">
+        <span><sup>1</sup> National Yang Ming Chiao Tung University</span>
+        <span><sup>2</sup> University of Illinois at Urbana-Champaign</span>
       </div>
       <div class="hero-links">
         <a class="pill-button" href="static/pdfs/paper.pdf" target="_blank" rel="noopener">
@@ -55,10 +69,6 @@
 
   <main>
     <section class="section-block teaser-block" id="teaser">
-      <div class="section-heading">
-        <h2>One Figure, Multiple Aspect Ratios</h2>
-        <p>A single reference diagram, rearranged for landscape, square, and portrait canvases.</p>
-      </div>
       <div class="teaser-carousel">
         <button type="button" class="icon-button" id="teaserPrev" title="Previous example" aria-label="Previous example"><i class="fas fa-chevron-left"></i></button>
         <div class="teaser-viewport" id="teaserViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Diagram relayout examples"><div class="teaser-track" id="teaserGrid"></div></div>
@@ -99,8 +109,8 @@
 
     <section class="section-block" id="quantitative">
       <p class="section-number">03 / BENCHMARK</p>
-      <h2>Faithful Structure, Across Canvases</h2>
-      <p class="section-intro">FlowchartRelayoutBench contains 100 flowcharts evaluated at five target aspect ratios. Content Fidelity requires both correct relationships and no added or omitted elements.</p>
+      <h2>Experimental Results</h2>
+      <p class="section-intro">FlowchartRelayoutBench evaluates 100 flowcharts at five target aspect ratios along four dimensions: <strong>Relationship Preservation</strong> checks connector sources, targets, and flow direction; <strong>Hallucination-free Rate</strong> checks that no elements are added or omitted; <strong>Layout Quality</strong> evaluates canvas utilization and arrangement; and <strong>Style Similarity</strong> evaluates colors, text, and connector styles. The first two are pass/fail metrics; the latter two are average ranks, where lower is better.</p>
       <div id="benchmarkTable"></div>
     </section>
 
@@ -112,42 +122,20 @@
       </div>
 
       <div class="explorer-shell">
-        <div class="explorer-toolbar">
-          <div>
-            <p class="toolbar-label">Example</p>
-            <div class="case-tabs" id="caseTabs"></div>
-          </div>
-        </div>
-        <div class="baseline-control"><p class="toolbar-label">Baseline</p><div class="choice-tabs" id="baselineTabs" aria-label="Baseline methods"></div></div>
-
-        <div class="case-header">
-          <div>
-            <h3 id="caseTitle">Flowchart 1</h3>
-            <p id="caseMeta">Source example</p>
-          </div>
-          <div class="difficulty-badge" id="difficultyBadge">easy</div>
-        </div>
-
-        <div class="original-band">
-          <div>
-            <p class="mini-label">Original reference</p>
-            <div class="original-frame" id="originalFrame"></div>
-          </div>
-          <div class="result-note">
-            <h4>Relayout targets</h4>
-            <p>Standard ratios include 1:1, 3:2, 16:9, 2:3, and 9:16. Ours additionally demonstrates 2.39:1 and 1:4 for extreme canvas adaptation.</p>
-          </div>
-        </div>
-
         <section class="method-panel ours-panel">
           <div class="method-title">
             <h4>Ours</h4>
-            <p>Fully editable aspect-ratio-adaptive relayouts.</p>
           </div>
-          <div class="ratio-grid" id="oursGrid"></div>
+          <div class="result-carousel carousel-shell">
+            <button type="button" class="icon-button carousel-prev" id="resultPrev" aria-label="Previous diagram" title="Previous diagram"><i class="fas fa-chevron-left"></i></button>
+            <div class="carousel-viewport" id="resultViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Qualitative comparisons"><div class="carousel-track" id="resultTrack"></div></div>
+            <button type="button" class="icon-button carousel-next" id="resultNext" aria-label="Next diagram" title="Next diagram"><i class="fas fa-chevron-right"></i></button>
+          </div>
+          <div class="carousel-dots" id="resultDots" aria-label="Diagram selection"></div>
         </section>
 
         <section class="method-panel">
+          <div class="baseline-control"><div class="choice-tabs" id="baselineTabs" aria-label="Baseline methods"></div></div>
           <div class="method-title with-select-copy">
             <div>
               <h4 id="baselineTitle">Baseline</h4>
@@ -159,8 +147,20 @@
       </div>
     </section>
 
-    <section class="section-block" id="ablation">
-      <p class="section-number">05 / ABLATION STUDY</p>
+    <section class="section-block" id="more-results">
+      <p class="section-number">05 / MORE RESULTS</p>
+      <h2>More Results</h2>
+      <p class="section-intro">The same ten source diagrams adapted to two additional canvases: 2.39:1 and 1:4.</p>
+      <div class="carousel-shell">
+        <button type="button" class="icon-button carousel-prev" id="morePrev" aria-label="Previous diagram" title="Previous diagram"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-viewport" id="moreViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Additional aspect ratios"><div class="carousel-track" id="moreTrack"></div></div>
+        <button type="button" class="icon-button carousel-next" id="moreNext" aria-label="Next diagram" title="Next diagram"><i class="fas fa-chevron-right"></i></button>
+      </div>
+      <div class="carousel-dots" id="moreDots" aria-label="Diagram selection"></div>
+    </section>
+
+    <section class="section-block band-muted" id="ablation">
+      <p class="section-number">06 / ABLATION STUDY</p>
       <h2>Ablation Result</h2>
       <p class="section-intro">A complexity-balanced subset of 30 flowcharts: 10 easy, 10 medium, and 10 hard. We examine stage decomposition, critic feedback, style reconstruction, and conventional graph layout.</p>
       <div id="ablationTable"></div>
@@ -172,16 +172,19 @@
       </div>
     </section>
 
-    <section class="section-block band-muted" id="style-transfer">
-      <p class="section-number">06 / OPTIONAL EXTENSION</p>
+    <section class="section-block" id="style-transfer">
+      <p class="section-number">07 / OPTIONAL EXTENSION</p>
       <h2>Style Transfer Result</h2>
       <p class="section-intro">An additional reference-guided Style Transfer stage restyles a completed relayout using an unrelated reference image. Colors, typography, corners, and arrows change while diagram structure and semantic content remain intact.</p>
-      <div class="choice-tabs" id="styleTabs" aria-label="Style transfer examples"></div>
-      <div class="style-gallery" id="styleGallery"></div>
+      <div class="carousel-shell style-carousel">
+        <button type="button" class="icon-button carousel-prev" id="stylePrev" aria-label="Previous style transfer" title="Previous style transfer"><i class="fas fa-chevron-left"></i></button>
+        <div class="style-gallery" id="styleGallery"></div>
+        <button type="button" class="icon-button carousel-next" id="styleNext" aria-label="Next style transfer" title="Next style transfer"><i class="fas fa-chevron-right"></i></button>
+      </div>
       <p class="figure-caption">Original diagram + style reference &rarr; restyled, draw.io-editable output.</p>
     </section>
 
-    <section class="section-block bibtex-block" id="bibtex">
+    <section class="section-block bibtex-block band-muted" id="bibtex">
       <div class="bibtex-header">
         <div>
           <h2>BibTeX</h2>
@@ -192,7 +195,7 @@
       </div>
       <pre id="bibtex-code"><code>@misc{onefigureeverycanvas2026,
   title={One Figure, Every Canvas: Editable Flowchart Relayout via Agentic Pipeline},
-  author={Anonymous Authors},
+  author={Shih-Chen Tseng and Chih-Hsuan Chen and Ryan Yang and Hsi-An Chen and Chun-Wei Tuan Mu and Yu-Lun Liu},
   year={2026}
 }</code></pre>
     </section>

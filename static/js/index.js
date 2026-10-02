@@ -104,6 +104,7 @@ const BASELINE_ISSUES = {
 let currentIndex = 0;
 let currentBaseline = "autofigure";
 let currentTeaser = 0;
+let currentStyle = "case1";
 
 function imageWithFallback(paths, className, alt) {
   const wrapper = document.createElement("div");
@@ -170,13 +171,13 @@ function renderTeasers() {
     composition.className = "teaser-composition";
     const reference = document.createElement("div");
     reference.className = "teaser-reference";
-    reference.appendChild(createTeaserFigure(example, "Reference", example.ref));
-    reference.appendChild(createTeaserFigure(example, `Ours / ${example.outputs[0][0]}`, example.outputs[0][1]));
+    reference.appendChild(createTeaserFigure(example, "Original", example.ref));
+    reference.appendChild(createTeaserFigure(example, example.outputs[0][0], example.outputs[0][1]));
     composition.appendChild(reference);
     const outputs = document.createElement("div");
     outputs.className = "teaser-outputs";
     example.outputs.slice(1).forEach(([ratio, file]) => {
-      const figure = createTeaserFigure(example, `Ours / ${ratio}`, file);
+      const figure = createTeaserFigure(example, ratio, file);
       figure.dataset.ratio = ratio;
       outputs.appendChild(figure);
     });
@@ -302,37 +303,12 @@ function selectedBaselineLabel() {
   return BASELINES.find((item) => item.value === currentBaseline).label;
 }
 
-function renderTabs() {
-  const tabs = document.getElementById("caseTabs");
-  if (!tabs) return;
-  tabs.innerHTML = "";
-  CASES.forEach((item, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = `case-tab${index === currentIndex ? " active" : ""}`;
-    button.textContent = String(index + 1);
-    button.title = item.id;
-    button.addEventListener("click", () => {
-      currentIndex = index;
-      renderExplorer();
-    });
-    tabs.appendChild(button);
-  });
-}
-
-function renderOriginal(caseId) {
-  const frame = document.getElementById("originalFrame");
-  frame.innerHTML = "";
-  const loaded = imageWithFallback(originalPaths(caseId), "original-image", `${caseId} original figure`);
-  frame.append(...loaded.wrapper.childNodes);
-}
-
-function renderOurs(caseId) {
-  const grid = document.getElementById("oursGrid");
-  grid.innerHTML = "";
-  RATIOS.forEach((ratio) => {
-    grid.appendChild(createRatioCard(ratio.label, oursPath(caseId, ratio.key), "", ratio.special));
-  });
+function createOriginalCard(caseId) {
+  const card = createRatioCard("Original", originalPaths(caseId)[0]);
+  const holder = card.querySelector(".image-zoom");
+  const loaded = imageWithFallback(originalPaths(caseId), "result-image", "Original diagram");
+  holder.replaceChildren(...loaded.wrapper.childNodes);
+  return card;
 }
 
 function renderBaseline(caseId) {
@@ -341,6 +317,7 @@ function renderBaseline(caseId) {
   const issues = document.getElementById("baselineIssues");
   const selected = BASELINES.find((item) => item.value === currentBaseline);
   grid.innerHTML = "";
+  grid.appendChild(createOriginalCard(caseId));
   title.textContent = selected.label;
   issues.innerHTML = `<ul>${BASELINE_ISSUES[currentBaseline].map(([metric, text]) => `<li><b>${metric}:</b> ${text}</li>`).join("")}</ul>`;
   RATIOS.filter((ratio) => ratio.baseline !== false).forEach((ratio) => {
@@ -355,24 +332,94 @@ function renderBaseline(caseId) {
   });
 }
 
-function sourceName(id) {
-  const match = id.match(/^[A-Z]+/);
-  return `${match ? match[0] : "Paper"} source diagram`;
+function renderExplorer() {
+  const track = document.getElementById("resultTrack");
+  track.replaceChildren();
+  CASES.forEach((item) => {
+    const slide = document.createElement("article");
+    slide.className = "carousel-slide";
+    const grid = document.createElement("div");
+    grid.className = "ratio-grid";
+    grid.appendChild(createOriginalCard(item.id));
+    RATIOS.filter((ratio) => ratio.baseline !== false).forEach((ratio) => {
+      grid.appendChild(createRatioCard(ratio.label, oursPath(item.id, ratio.key)));
+    });
+    slide.appendChild(grid);
+    track.appendChild(slide);
+  });
+  setupImageCarousel("result", CASES.length, (index) => {
+    currentIndex = index;
+    renderBaseline(CASES[index].id);
+  });
 }
 
-function renderExplorer() {
-  const item = CASES[currentIndex];
-  const title = document.getElementById("caseTitle");
-  const meta = document.getElementById("caseMeta");
-  const badge = document.getElementById("difficultyBadge");
-  title.textContent = `Flowchart ${currentIndex + 1}`;
-  meta.textContent = `${sourceName(item.id)} · ${item.id}`;
-  badge.textContent = item.difficulty;
-  badge.className = `difficulty-badge ${item.difficulty}`;
-  renderTabs();
-  renderOriginal(item.id);
-  renderOurs(item.id);
-  renderBaseline(item.id);
+function renderMoreResults() {
+  const track = document.getElementById("moreTrack");
+  CASES.forEach((item) => {
+    const slide = document.createElement("article");
+    slide.className = "carousel-slide more-slide";
+    slide.appendChild(createOriginalCard(item.id));
+    slide.appendChild(createRatioCard("2.39:1", oursPath(item.id, "2.39_1")));
+    const tall = createRatioCard("1:4", oursPath(item.id, "1_4"));
+    tall.classList.add("more-tall");
+    slide.appendChild(tall);
+    track.appendChild(slide);
+  });
+  setupImageCarousel("more", CASES.length);
+}
+
+function setupImageCarousel(prefix, count, onSelect = () => {}) {
+  const viewport = document.getElementById(`${prefix}Viewport`);
+  const slides = [...document.getElementById(`${prefix}Track`).children];
+  const dots = document.getElementById(`${prefix}Dots`);
+  let index = 0;
+  let scrollTimer;
+  const update = () => {
+    slides.forEach((slide, position) => slide.inert = position !== index);
+    [...dots.children].forEach((dot, position) => {
+      dot.classList.toggle("active", position === index);
+      dot.setAttribute("aria-pressed", String(position === index));
+    });
+    onSelect(index);
+  };
+  const select = (next) => {
+    index = (next + count) % count;
+    viewport.scrollTo({ left: viewport.clientWidth * index,
+      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    update();
+  };
+  slides.forEach((slide, position) => {
+    slide.setAttribute("aria-label", `Diagram ${position + 1}`);
+    slide.setAttribute("aria-roledescription", "slide");
+    const dot = document.createElement("button");
+    dot.className = "teaser-dot";
+    dot.type = "button";
+    dot.title = `Diagram ${position + 1}`;
+    dot.setAttribute("aria-label", dot.title);
+    dot.addEventListener("click", () => select(position));
+    dots.appendChild(dot);
+  });
+  document.getElementById(`${prefix}Prev`).addEventListener("click", () => select(index - 1));
+  document.getElementById(`${prefix}Next`).addEventListener("click", () => select(index + 1));
+  viewport.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    select(event.key === "Home" ? 0 : event.key === "End" ? count - 1 : index + (event.key === "ArrowRight" ? 1 : -1));
+  });
+  viewport.addEventListener("scroll", () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const next = Math.round(viewport.scrollLeft / viewport.clientWidth);
+      if (next !== index) { index = next; update(); }
+    }, 120);
+  }, { passive: true });
+  let width = viewport.clientWidth;
+  new ResizeObserver(() => {
+    if (width === viewport.clientWidth) return;
+    width = viewport.clientWidth;
+    viewport.scrollTo({ left: width * index, behavior: "instant" });
+  }).observe(viewport);
+  update();
 }
 
 function setupBaselineSelect() {
@@ -534,9 +581,10 @@ function renderFigureComparison(containerId, entries) {
   });
 }
 
-function renderAblation(id = ABLATIONS[0].id) {
+function renderAblation(id = "style") {
   const item = ABLATIONS.find((entry) => entry.id === id);
-  renderChoices("ablationTabs", ABLATIONS, id, renderAblation);
+  const order = ["style", "direct_prompt_layout", "parse", "layout", "graphiz"];
+  renderChoices("ablationTabs", order.map((key) => ABLATIONS.find((entry) => entry.id === key)), id, renderAblation);
   document.getElementById("ablationTitle").textContent = item.title;
   document.getElementById("ablationDescription").textContent = item.description;
   renderFigureComparison("ablationGallery", item.images.map(([label, file]) =>
@@ -544,7 +592,7 @@ function renderAblation(id = ABLATIONS[0].id) {
 }
 
 function renderStyleTransfer(id = "case1") {
-  renderChoices("styleTabs", [{ id: "case1", label: "Example 1" }, { id: "case2", label: "Example 2" }], id, renderStyleTransfer);
+  currentStyle = id;
   const original = `static/images/style_transfer/${id}_original.png`;
   const transferred = `static/images/style_transfer/${id}_style_transferred.${id === "case1" ? "jpg" : "png"}`;
   const gallery = document.getElementById("styleGallery");
@@ -579,6 +627,9 @@ function setupResearchSections() {
   Object.entries(RESEARCH_TABLES).forEach(([key, config]) => renderResearchTable(`${key}Table`, config));
   renderAblation();
   renderStyleTransfer();
+  document.getElementById("stylePrev").addEventListener("click", () => renderStyleTransfer(currentStyle === "case1" ? "case2" : "case1"));
+  document.getElementById("styleNext").addEventListener("click", () => renderStyleTransfer(currentStyle === "case1" ? "case2" : "case1"));
+  renderMoreResults();
   const dialog = document.getElementById("figureDialog");
   document.addEventListener("click", (event) => {
     const button = event.target.closest(".image-zoom");
