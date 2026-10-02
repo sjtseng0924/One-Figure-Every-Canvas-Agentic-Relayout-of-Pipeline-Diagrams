@@ -587,15 +587,14 @@ function renderStyleTransfer(id = "case1") {
   const original = `static/images/style_transfer/${id}_original.png`;
   const transferred = `static/images/style_transfer/${id}_style_transferred.${id === "case1" ? "jpg" : "png"}`;
   const gallery = document.getElementById("styleGallery");
-  gallery.classList.toggle("is-portrait", id === "case1");
   gallery.innerHTML = `
     <figure class="style-reference comparison-figure">
       <figcaption>Style Reference</figcaption>
       <div class="figure-media"><img src="static/images/style_transfer/${id}_style_ref.png" alt="Style reference" loading="lazy"></div>
     </figure>
-    <figure class="style-comparison" style="--label-ratio: ${id === "case1" ? 402 / 602 : 1361 / 444}">
+    <figure class="style-comparison">
       <figcaption class="style-labels"><span>Style Transfer</span><span>Original</span></figcaption>
-      <div class="before-after" style="--reveal: 50%; --image-ratio: ${id === "case1" ? 402 / 602 : 1361 / 444}">
+      <div class="before-after" style="--reveal: 50%">
         <img class="before-image" src="${original}" alt="Original diagram" draggable="false">
         <div class="after-layer"><img class="after-image" src="${transferred}" alt="Style-transferred diagram" draggable="false"></div>
         <div class="compare-divider" aria-hidden="true"><span><i class="fas fa-arrows-alt-h"></i></span></div>
