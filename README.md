@@ -44,7 +44,7 @@ credentials or access tokens.
 
 ## Before Publishing
 
-- Replace the `href="#"` placeholders for arXiv, Code, and Data in `index.html`.
+- Replace the `href="#"` placeholders for arXiv and Data in `index.html`.
 - Confirm that `static/pdfs/paper.pdf` is the intended public paper version.
 - Check all result images, carousel arrows, baseline selectors, and style sliders.
 - Keep filename capitalization exact: Vercel paths are case-sensitive.

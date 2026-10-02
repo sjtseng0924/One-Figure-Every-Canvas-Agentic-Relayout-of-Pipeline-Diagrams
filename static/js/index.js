@@ -12,15 +12,15 @@ const TEASERS = [
     ]
   },
   {
-    title: "Dense architecture diagram",
-    folder: "ECCV23",
+    title: "Long-form visual pipeline",
+    folder: "NeurIPS5",
     ref: "ref.jpeg",
     outputs: [
-      ["4:1", "ECCV2024-00023_4_1.png"],
-      ["3:2", "ECCV2024-00023_3_2.png"],
-      ["1:1", "ECCV2024-00023_1_1.png"],
-      ["2:3", "ECCV2024-00023_2_3.png"],
-      ["7:24", "ECCV2024-00023_7_24.png"]
+      ["16:9", "NeurIPS2025-00005_16_9.png"],
+      ["3:2", "NeurIPS2025-00005_3_2.png"],
+      ["1:1", "NeurIPS2025-00005_1_1.png"],
+      ["2:3", "NeurIPS2025-00005_2_3.png"],
+      ["9:16", "NeurIPS2025-00005_9_16.png"]
     ]
   },
   {
@@ -36,15 +36,15 @@ const TEASERS = [
     ]
   },
   {
-    title: "Long-form visual pipeline",
-    folder: "NeurIPS5",
+    title: "Dense architecture diagram",
+    folder: "ECCV23",
     ref: "ref.jpeg",
     outputs: [
-      ["16:9", "NeurIPS2025-00005_16_9.png"],
-      ["3:2", "NeurIPS2025-00005_3_2.png"],
-      ["1:1", "NeurIPS2025-00005_1_1.png"],
-      ["2:3", "NeurIPS2025-00005_2_3.png"],
-      ["9:16", "NeurIPS2025-00005_9_16.png"]
+      ["4:1", "ECCV2024-00023_4_1.png"],
+      ["3:2", "ECCV2024-00023_3_2.png"],
+      ["1:1", "ECCV2024-00023_1_1.png"],
+      ["2:3", "ECCV2024-00023_2_3.png"],
+      ["7:24", "ECCV2024-00023_7_24.png"]
     ]
   }
 ];
