@@ -79,28 +79,6 @@ const RATIOS = [
   { key: "1_4", label: "1:4", special: true, baseline: false }
 ];
 
-const BASELINE_ISSUES = {
-  paperbanana: [
-    ["Relationship Preservation", "Extra edges are frequently generated."],
-    ["Hallucination-free Rate", "May introduce content inconsistent with the original figure."],
-    ["Style Similarity", "Text-only input often causes large style deviations from the original."],
-    ["Layout Quality", "Some portrait targets become rotated landscape diagrams."]
-  ],
-  autofigure: [
-    ["Relationship Preservation", "SVG parsing can struggle to represent flowchart relationships reliably."],
-    ["Layout Quality", "Some portrait targets become rotated landscape diagrams."]
-  ],
-  gpt: [
-    ["Hallucination-free Rate", "Hard flowcharts may duplicate components or produce incorrect fine-grained blocks."],
-    ["Layout Quality", "Often stretches or compresses the source image instead of performing true relayout."]
-  ],
-  nanobanana: [
-    ["Relationship Preservation", "Large-ratio changes often cause severe relationship errors."],
-    ["Hallucination-free Rate", "Hard flowcharts may duplicate, omit, or alter fine-grained blocks."],
-    ["Layout Quality", "Similar ratios can reuse the original layout and leave large empty margins."]
-  ]
-};
-
 let currentIndex = 0;
 let currentBaseline = "autofigure";
 let currentTeaser = 0;
@@ -172,7 +150,7 @@ function renderTeasers() {
     const reference = document.createElement("div");
     reference.className = "teaser-reference";
     reference.appendChild(createTeaserFigure(example, "Original", example.ref));
-    reference.appendChild(createTeaserFigure(example, example.outputs[0][0], example.outputs[0][1]));
+    reference.appendChild(createTeaserFigure(example, `Ours · ${example.outputs[0][0]}`, example.outputs[0][1]));
     composition.appendChild(reference);
     const outputs = document.createElement("div");
     outputs.className = "teaser-outputs";
@@ -195,7 +173,8 @@ function renderTeasers() {
   });
   const viewport = document.getElementById("teaserViewport");
   viewport.addEventListener("scroll", () => {
-    const index = Math.round(viewport.scrollLeft / viewport.clientWidth);
+    if (!viewport.clientWidth) return;
+    const index = Math.max(0, Math.min(TEASERS.length - 1, Math.round(viewport.scrollLeft / viewport.clientWidth)));
     if (index !== currentTeaser) {
       currentTeaser = index;
       updateTeaserControls();
@@ -207,13 +186,19 @@ function renderTeasers() {
     selectTeaser(event.key === "Home" ? 0 : event.key === "End" ? TEASERS.length - 1 :
       currentTeaser + (event.key === "ArrowRight" ? 1 : -1));
   });
+  window.addEventListener("pageshow", () => {
+    currentTeaser = 0;
+    viewport.scrollTo({ left: 0, behavior: "instant" });
+    updateTeaserControls();
+  });
+  viewport.scrollTo({ left: 0, behavior: "instant" });
   updateTeaserControls();
 }
 
 function createTeaserFigure(item, label, file) {
   const figure = document.createElement("figure");
   figure.className = "teaser-figure";
-  figure.innerHTML = `<figcaption>${label}</figcaption><button class="image-zoom" type="button" title="Enlarge ${label}" aria-haspopup="dialog"><img src="${teaserPath(item, file)}" alt="${item.title}: ${label}" decoding="async"></button>`;
+  figure.innerHTML = `<figcaption>${label}</figcaption><div class="figure-media"><img src="${teaserPath(item, file)}" alt="${item.title}: ${label}" decoding="async"></div>`;
   const img = figure.querySelector("img");
   const updateSize = () => img.style.setProperty("--natural-ratio", img.naturalWidth / img.naturalHeight);
   img.addEventListener("load", updateSize);
@@ -222,15 +207,13 @@ function createTeaserFigure(item, label, file) {
 }
 
 function updateTeaserControls() {
-  const item = TEASERS[currentTeaser];
-  document.querySelectorAll(".teaser-dot").forEach((button, index) => {
+  document.querySelectorAll("#teaserTabs .teaser-dot").forEach((button, index) => {
     button.classList.toggle("active", index === currentTeaser);
     button.setAttribute("aria-pressed", String(index === currentTeaser));
   });
   document.querySelectorAll(".teaser-slide").forEach((slide, index) => {
     slide.inert = index !== currentTeaser;
   });
-  document.getElementById("teaserCaption").innerHTML = `<strong>${item.title}.</strong> The same diagram, adapted to five target aspect ratios.`;
 }
 
 function selectTeaser(index) {
@@ -253,13 +236,10 @@ function createRatioCard(label, src, hoverSrc = "", special = false) {
   if (hoverSrc) {
     holder.append(...loaded.wrapper.childNodes);
   } else {
-    const zoom = document.createElement("button");
-    zoom.className = "image-zoom";
-    zoom.type = "button";
-    zoom.title = `Enlarge ${label} result`;
-    zoom.setAttribute("aria-haspopup", "dialog");
-    zoom.append(...loaded.wrapper.childNodes);
-    holder.appendChild(zoom);
+    const media = document.createElement("div");
+    media.className = "figure-media";
+    media.append(...loaded.wrapper.childNodes);
+    holder.appendChild(media);
   }
   if (hoverSrc) {
     const hint = document.createElement("span");
@@ -305,7 +285,7 @@ function selectedBaselineLabel() {
 
 function createOriginalCard(caseId) {
   const card = createRatioCard("Original", originalPaths(caseId)[0]);
-  const holder = card.querySelector(".image-zoom");
+  const holder = card.querySelector(".figure-media");
   const loaded = imageWithFallback(originalPaths(caseId), "result-image", "Original diagram");
   holder.replaceChildren(...loaded.wrapper.childNodes);
   return card;
@@ -314,12 +294,10 @@ function createOriginalCard(caseId) {
 function renderBaseline(caseId) {
   const grid = document.getElementById("baselineGrid");
   const title = document.getElementById("baselineTitle");
-  const issues = document.getElementById("baselineIssues");
   const selected = BASELINES.find((item) => item.value === currentBaseline);
   grid.innerHTML = "";
   grid.appendChild(createOriginalCard(caseId));
   title.textContent = selected.label;
-  issues.innerHTML = `<ul>${BASELINE_ISSUES[currentBaseline].map(([metric, text]) => `<li><b>${metric}:</b> ${text}</li>`).join("")}</ul>`;
   RATIOS.filter((ratio) => ratio.baseline !== false).forEach((ratio) => {
     grid.appendChild(
       createRatioCard(
@@ -409,7 +387,8 @@ function setupImageCarousel(prefix, count, onSelect = () => {}) {
   viewport.addEventListener("scroll", () => {
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
-      const next = Math.round(viewport.scrollLeft / viewport.clientWidth);
+      if (!viewport.clientWidth) return;
+      const next = Math.max(0, Math.min(count - 1, Math.round(viewport.scrollLeft / viewport.clientWidth)));
       if (next !== index) { index = next; update(); }
     }, 120);
   }, { passive: true });
@@ -419,6 +398,13 @@ function setupImageCarousel(prefix, count, onSelect = () => {}) {
     width = viewport.clientWidth;
     viewport.scrollTo({ left: width * index, behavior: "instant" });
   }).observe(viewport);
+  window.addEventListener("pageshow", () => {
+    clearTimeout(scrollTimer);
+    index = 0;
+    viewport.scrollTo({ left: 0, behavior: "instant" });
+    update();
+  });
+  viewport.scrollTo({ left: 0, behavior: "instant" });
   update();
 }
 
@@ -533,27 +519,27 @@ const ABLATIONS = [
   {
     id: "direct_prompt_layout", label: "Direct Prompting", title: "Direct Prompt Layout Stage",
     description: "Direct prompting leaves substantial unused space and excessively shrinks components. Our method uses the available canvas more effectively while preserving component sizes and clear connector flow.",
-    images: [["Original", "original.jpeg"], ["Direct Prompt Layout", "gemini-layout_red.png"], ["Ours", "ours.png"]]
+    images: [["Original", "original.jpeg"], ["Direct Prompt Layout", "gemini-layout.png"], ["Ours", "ours.png"]]
   },
   {
-    id: "parse", label: "Parse Critic", title: "The Role of the Parse Critic",
+    id: "parse", label: "Parse Critic", title: "Without Parse Critic",
     description: "Without the Parse Critic, incorrect shape types and mismatched connector attachment points remain uncorrected. Iterative feedback improves component geometry and edge anchoring.",
     images: [["Original", "original.jpeg"], ["Without Parse Critic", "wo_critic.png"], ["With Parse Critic", "w_critic.png"]]
   },
   {
-    id: "style", label: "Style Stage", title: "Reconstructing the Original Appearance",
+    id: "style", label: "Style Stage", title: "Without Style Stage",
     description: "Removing the Style Stage introduces mismatched colors, simplified containers, inconsistent connector styles, and typography differences. Style reconstruction improves visual correspondence while retaining structure.",
     images: [["Original", "original.png"], ["Without Style Stage", "wo_style.png"], ["With Style Stage", "w_style.png"]]
   },
   {
-    id: "layout", label: "Layout Critic", title: "Refining the Target-Canvas Layout",
+    id: "layout", label: "Layout Critic", title: "Without Layout Critic",
     description: "The single-pass result has weaker space utilization and less natural arrow routing. Deterministic and visual feedback improves placement, compactness, and readability while preserving connectivity.",
     images: [["Original", "original.png"], ["Without Layout Critic", "wo_critic.png"], ["With Layout Critic", "w_critic.png"]]
   },
   {
-    id: "graphiz", label: "Graphviz", title: "Beyond Topology-Driven Graph Layout",
+    id: "graphiz", label: "Graphviz", title: "Replacing Layout Stage with Graphviz DOT",
     description: "Graphviz DOT leaves unused space and can lose relationships involving containers. Our Layout Stage accounts for the target canvas while maintaining those structural relationships.",
-    images: [["Original", "original.jpeg"], ["Graphviz DOT", "graphviz_red.png"], ["Ours", "ours.png"]]
+    images: [["Original", "original.jpeg"], ["Graphviz DOT", "graphviz.png"], ["Ours", "ours.png"]]
   }
 ];
 
@@ -566,24 +552,21 @@ function renderFigureComparison(containerId, entries) {
     const caption = document.createElement("figcaption");
     caption.textContent = label;
     if (label.startsWith("Ours") || label.startsWith("With ")) figure.classList.add("ours-figure");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "image-zoom";
-    button.title = `Enlarge ${label}`;
-    button.setAttribute("aria-haspopup", "dialog");
+    const media = document.createElement("div");
+    media.className = "figure-media";
     const img = document.createElement("img");
     img.src = src;
     img.alt = label;
     img.loading = "lazy";
-    button.appendChild(img);
-    figure.append(caption, button);
+    media.appendChild(img);
+    figure.append(caption, media);
     container.appendChild(figure);
   });
 }
 
-function renderAblation(id = "style") {
+function renderAblation(id = "direct_prompt_layout") {
   const item = ABLATIONS.find((entry) => entry.id === id);
-  const order = ["style", "direct_prompt_layout", "parse", "layout", "graphiz"];
+  const order = ["direct_prompt_layout", "parse", "layout", "style", "graphiz"];
   renderChoices("ablationTabs", order.map((key) => ABLATIONS.find((entry) => entry.id === key)), id, renderAblation);
   document.getElementById("ablationTitle").textContent = item.title;
   document.getElementById("ablationDescription").textContent = item.description;
@@ -599,13 +582,13 @@ function renderStyleTransfer(id = "case1") {
   gallery.innerHTML = `
     <figure class="style-reference comparison-figure">
       <figcaption>Style Reference</figcaption>
-      <button class="image-zoom" type="button" title="Enlarge style reference" aria-haspopup="dialog"><img src="static/images/style_transfer/${id}_style_ref.png" alt="Example ${id.slice(-1)} style reference" loading="lazy"></button>
+      <div class="figure-media"><img src="static/images/style_transfer/${id}_style_ref.png" alt="Style reference" loading="lazy"></div>
     </figure>
     <figure class="style-comparison">
       <figcaption>Original / Style Transfer</figcaption>
       <div class="before-after" style="--reveal: 50%; --image-ratio: ${id === "case1" ? 402 / 602 : 1361 / 444}">
         <img class="before-image" src="${original}" alt="Original diagram" draggable="false">
-        <img class="after-image" src="${transferred}" alt="Style-transferred diagram" draggable="false">
+        <div class="after-layer"><img class="after-image" src="${transferred}" alt="Style-transferred diagram" draggable="false"></div>
         <span class="compare-label label-before">Original</span>
         <span class="compare-label label-after">Transferred</span>
         <div class="compare-divider" aria-hidden="true"><span><i class="fas fa-arrows-alt-h"></i></span></div>
@@ -614,9 +597,24 @@ function renderStyleTransfer(id = "case1") {
       <div class="compare-endpoints"><span>Original</span><span>Style Transfer</span></div>
     </figure>
   `;
+  const dots = document.getElementById("styleDots");
+  dots.replaceChildren();
+  ["case1", "case2"].forEach((caseId, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "teaser-dot";
+    dot.classList.toggle("active", caseId === id);
+    dot.title = `Style transfer ${index + 1}`;
+    dot.setAttribute("aria-label", dot.title);
+    dot.setAttribute("aria-pressed", String(caseId === id));
+    dot.addEventListener("click", () => renderStyleTransfer(caseId));
+    dots.appendChild(dot);
+  });
   const range = gallery.querySelector(".compare-range");
   range.addEventListener("input", () => {
     gallery.querySelector(".before-after").style.setProperty("--reveal", `${range.value}%`);
+    gallery.querySelector(".before-image").style.visibility = Number(range.value) === 100 ? "hidden" : "visible";
+    gallery.querySelector(".after-layer").style.visibility = Number(range.value) === 0 ? "hidden" : "visible";
     range.setAttribute("aria-valuetext", `${range.value}% transferred`);
     gallery.querySelector(".label-after").hidden = Number(range.value) < 10;
     gallery.querySelector(".label-before").hidden = Number(range.value) > 90;
@@ -630,21 +628,6 @@ function setupResearchSections() {
   document.getElementById("stylePrev").addEventListener("click", () => renderStyleTransfer(currentStyle === "case1" ? "case2" : "case1"));
   document.getElementById("styleNext").addEventListener("click", () => renderStyleTransfer(currentStyle === "case1" ? "case2" : "case1"));
   renderMoreResults();
-  const dialog = document.getElementById("figureDialog");
-  document.addEventListener("click", (event) => {
-    const button = event.target.closest(".image-zoom");
-    if (!button) return;
-    const source = button.querySelector("img");
-    const expanded = document.getElementById("expandedFigure");
-    expanded.src = source.src;
-    expanded.alt = source.alt;
-    document.getElementById("figureDialogTitle").textContent = source.alt;
-    dialog.showModal();
-  });
-  document.getElementById("closeFigure").addEventListener("click", () => dialog.close());
-  dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) dialog.close();
-  });
 }
 
 function scrollToTop() {

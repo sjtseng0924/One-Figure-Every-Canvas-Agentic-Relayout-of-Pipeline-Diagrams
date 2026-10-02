@@ -42,9 +42,9 @@
       <h1>One Figure, Every Canvas</h1>
       <p class="subtitle">Editable Flowchart Relayout via Agentic Pipeline</p>
       <div class="authors">
-        <span>Shih-Chen Tseng<sup>1</sup>,</span>
-        <span>Chih-Hsuan Chen<sup>1</sup>,</span>
-        <span>Ryan Yang<sup>2</sup>,</span>
+        <span>Shih-Chen Tseng<sup>1,*</sup>,</span>
+        <span>Chih-Hsuan Chen<sup>1,*</sup>,</span>
+        <span>Ryan Yang<sup>2,*</sup>,</span>
         <span>Hsi-An Chen<sup>1</sup>,</span>
         <span>Chun-Wei Tuan Mu<sup>1</sup>,</span>
         <span>Yu-Lun Liu<sup>1</sup></span>
@@ -53,6 +53,7 @@
         <span><sup>1</sup> National Yang Ming Chiao Tung University</span>
         <span><sup>2</sup> University of Illinois at Urbana-Champaign</span>
       </div>
+      <p class="author-note">* Equal contribution</p>
       <div class="hero-links">
         <a class="pill-button" href="static/pdfs/paper.pdf" target="_blank" rel="noopener">
           <i class="fas fa-file-pdf"></i><span>Paper</span>
@@ -61,7 +62,10 @@
           <i class="fas fa-scroll"></i><span>arXiv</span>
         </a>
         <a class="pill-button" href="#" target="_blank" rel="noopener">
-          <i class="fab fa-github"></i><span>GitHub</span>
+          <i class="fab fa-github"></i><span>Code</span>
+        </a>
+        <a class="pill-button" href="#" target="_blank" rel="noopener">
+          <i class="fas fa-database"></i><span>Data</span>
         </a>
       </div>
     </div>
@@ -75,11 +79,10 @@
         <button type="button" class="icon-button" id="teaserNext" title="Next example" aria-label="Next example"><i class="fas fa-chevron-right"></i></button>
       </div>
       <div class="teaser-dots" id="teaserTabs" aria-label="Teaser examples"></div>
-      <p class="teaser-caption" id="teaserCaption" aria-live="polite"></p>
+      <p class="teaser-caption" id="teaserCaption">Given a single raster flowchart, our Parse, Style, and Layout agents adapt its structure, content, and appearance to different aspect ratios for papers, slides, posters, and phone previews, producing mxGraph XML that remains fully editable in draw.io for further refinement.</p>
     </section>
 
     <section class="section-block paper-summary band-muted" id="abstract">
-      <p class="section-number">01 / OVERVIEW</p>
       <h2>Abstract</h2>
         <div class="copy">
           <p>
@@ -98,17 +101,14 @@
     </section>
 
     <section class="section-block band-muted" id="method">
-      <p class="section-number">02 / METHOD</p>
       <h2>Method Overview</h2>
-      <p class="section-intro">Three stages transform a raster flowchart into an editable diagram for a new canvas. Each agent works with a critic to verify structure, visual appearance, and layout.</p>
+      <p class="section-intro">Three stages transform a raster flowchart into an editable diagram for a new canvas. Each agent works with a critic to verify structure, visual appearance, and layout. Intermediate and final representations remain in draw.io-compatible mxGraph XML.</p>
       <figure class="method-figure">
-        <button class="image-zoom" type="button" title="Enlarge pipeline overview"><img src="static/images/method/overview.png" alt="Agentic pipeline: SAM 3-assisted Parse, deterministic color extraction and Style, and graph-preserving Layout, each paired with a critic." loading="lazy"></button>
-        <figcaption>From a raster input at 4:3 to a draw.io-editable output at 16:9. Intermediate representations remain in mxGraph XML.</figcaption>
+        <div class="figure-media"><img src="static/images/method/overview.png" alt="Agentic pipeline: SAM 3-assisted Parse, deterministic color extraction and Style, and graph-preserving Layout, each paired with a critic." loading="lazy"></div>
       </figure>
     </section>
 
     <section class="section-block" id="quantitative">
-      <p class="section-number">03 / BENCHMARK</p>
       <h2>Experimental Results</h2>
       <p class="section-intro">FlowchartRelayoutBench evaluates 100 flowcharts at five target aspect ratios along four dimensions: <strong>Relationship Preservation</strong> checks connector sources, targets, and flow direction; <strong>Hallucination-free Rate</strong> checks that no elements are added or omitted; <strong>Layout Quality</strong> evaluates canvas utilization and arrangement; and <strong>Style Similarity</strong> evaluates colors, text, and connector styles. The first two are pass/fail metrics; the latter two are average ranks, where lower is better.</p>
       <div id="benchmarkTable"></div>
@@ -116,7 +116,6 @@
 
     <section class="section-block result-explorer band-muted" id="results">
       <div class="section-heading compact">
-        <p class="section-number">04 / QUALITATIVE RESULTS</p>
         <h2>Qualitative Comparisons</h2>
         <p>Aspect-ratio adaptation across ten pipeline diagrams, compared with four image-generation and diagram-editing baselines.</p>
       </div>
@@ -140,7 +139,6 @@
             <div>
               <h4 id="baselineTitle">Baseline</h4>
             </div>
-            <div class="issue-list" id="baselineIssues"></div>
           </div>
           <div class="ratio-grid" id="baselineGrid"></div>
         </section>
@@ -148,9 +146,8 @@
     </section>
 
     <section class="section-block" id="more-results">
-      <p class="section-number">05 / MORE RESULTS</p>
-      <h2>More Results</h2>
-      <p class="section-intro">The same ten source diagrams adapted to two additional canvases: 2.39:1 and 1:4.</p>
+      <h2>More Canvas Results from Ours</h2>
+      <p class="section-intro">Our XML-based pipeline adapts the same ten diagrams to additional canvases: <strong>2.39:1, a cinematic widescreen aspect ratio</strong>, and <strong>1:4, an extreme portrait aspect ratio</strong>, while preserving structure and draw.io editability. VLM-driven image-generation baselines have limited support for arbitrary canvas ratios; the 1:4 target falls outside the approximately 3:1 to 1:3 range reported in our paper.</p>
       <div class="carousel-shell">
         <button type="button" class="icon-button carousel-prev" id="morePrev" aria-label="Previous diagram" title="Previous diagram"><i class="fas fa-chevron-left"></i></button>
         <div class="carousel-viewport" id="moreViewport" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Additional aspect ratios"><div class="carousel-track" id="moreTrack"></div></div>
@@ -160,9 +157,8 @@
     </section>
 
     <section class="section-block band-muted" id="ablation">
-      <p class="section-number">06 / ABLATION STUDY</p>
       <h2>Ablation Result</h2>
-      <p class="section-intro">A complexity-balanced subset of 30 flowcharts: 10 easy, 10 medium, and 10 hard. We examine stage decomposition, critic feedback, style reconstruction, and conventional graph layout.</p>
+      <p class="section-intro">On a balanced subset of 30 flowcharts, we study three categories: <strong>direct prompting versus multi-stage decomposition</strong>, <strong>Style Stage and Critic Agent removal</strong>, and <strong>replacing the Layout Stage with Graphviz DOT</strong>. The comparisons below correspond to the qualitative ablation figures in the paper appendix.</p>
       <div id="ablationTable"></div>
       <div class="study-gallery">
         <div class="choice-tabs" id="ablationTabs" aria-label="Ablation comparisons"></div>
@@ -173,7 +169,6 @@
     </section>
 
     <section class="section-block" id="style-transfer">
-      <p class="section-number">07 / OPTIONAL EXTENSION</p>
       <h2>Style Transfer Result</h2>
       <p class="section-intro">An additional reference-guided Style Transfer stage restyles a completed relayout using an unrelated reference image. Colors, typography, corners, and arrows change while diagram structure and semantic content remain intact.</p>
       <div class="carousel-shell style-carousel">
@@ -181,7 +176,7 @@
         <div class="style-gallery" id="styleGallery"></div>
         <button type="button" class="icon-button carousel-next" id="styleNext" aria-label="Next style transfer" title="Next style transfer"><i class="fas fa-chevron-right"></i></button>
       </div>
-      <p class="figure-caption">Original diagram + style reference &rarr; restyled, draw.io-editable output.</p>
+      <div class="carousel-dots" id="styleDots" aria-label="Style transfer selection"></div>
     </section>
 
     <section class="section-block bibtex-block band-muted" id="bibtex">
@@ -200,13 +195,5 @@
 }</code></pre>
     </section>
   </main>
-  <dialog id="figureDialog" class="figure-dialog" aria-labelledby="figureDialogTitle">
-    <div class="dialog-toolbar"><p id="figureDialogTitle"></p><button id="closeFigure" class="icon-button" type="button" aria-label="Close image" title="Close image"><i class="fas fa-times"></i></button></div>
-    <img id="expandedFigure" alt="">
-  </dialog>
-
-  <footer class="footer">
-    <p>One Figure, Every Canvas</p>
-  </footer>
 </body>
 </html>
