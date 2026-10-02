@@ -150,15 +150,23 @@ function renderTeasers() {
     const reference = document.createElement("div");
     reference.className = "teaser-reference";
     reference.appendChild(createTeaserFigure(example, "Original", example.ref));
-    reference.appendChild(createTeaserFigure(example, `Ours · ${example.outputs[0][0]}`, example.outputs[0][1]));
     composition.appendChild(reference);
-    const outputs = document.createElement("div");
+    const outputs = document.createElement("fieldset");
     outputs.className = "teaser-outputs";
+    const legend = document.createElement("legend");
+    legend.textContent = "Ours";
+    outputs.appendChild(legend);
+    const ratios = document.createElement("div");
+    ratios.className = "teaser-ratios";
     example.outputs.slice(1).forEach(([ratio, file]) => {
       const figure = createTeaserFigure(example, ratio, file);
       figure.dataset.ratio = ratio;
-      outputs.appendChild(figure);
+      ratios.appendChild(figure);
     });
+    outputs.appendChild(ratios);
+    const wide = createTeaserFigure(example, example.outputs[0][0], example.outputs[0][1]);
+    wide.classList.add("teaser-wide");
+    outputs.appendChild(wide);
     composition.appendChild(outputs);
     slide.appendChild(composition);
     grid.appendChild(slide);
@@ -579,22 +587,20 @@ function renderStyleTransfer(id = "case1") {
   const original = `static/images/style_transfer/${id}_original.png`;
   const transferred = `static/images/style_transfer/${id}_style_transferred.${id === "case1" ? "jpg" : "png"}`;
   const gallery = document.getElementById("styleGallery");
+  gallery.classList.toggle("is-portrait", id === "case1");
   gallery.innerHTML = `
     <figure class="style-reference comparison-figure">
       <figcaption>Style Reference</figcaption>
       <div class="figure-media"><img src="static/images/style_transfer/${id}_style_ref.png" alt="Style reference" loading="lazy"></div>
     </figure>
-    <figure class="style-comparison">
-      <figcaption>Original / Style Transfer</figcaption>
+    <figure class="style-comparison" style="--label-ratio: ${id === "case1" ? 402 / 602 : 1361 / 444}">
+      <figcaption class="style-labels"><span>Style Transfer</span><span>Original</span></figcaption>
       <div class="before-after" style="--reveal: 50%; --image-ratio: ${id === "case1" ? 402 / 602 : 1361 / 444}">
         <img class="before-image" src="${original}" alt="Original diagram" draggable="false">
         <div class="after-layer"><img class="after-image" src="${transferred}" alt="Style-transferred diagram" draggable="false"></div>
-        <span class="compare-label label-before">Original</span>
-        <span class="compare-label label-after">Transferred</span>
         <div class="compare-divider" aria-hidden="true"><span><i class="fas fa-arrows-alt-h"></i></span></div>
         <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Reveal transferred style" aria-valuetext="50% transferred">
       </div>
-      <div class="compare-endpoints"><span>Original</span><span>Style Transfer</span></div>
     </figure>
   `;
   const dots = document.getElementById("styleDots");
@@ -616,8 +622,6 @@ function renderStyleTransfer(id = "case1") {
     gallery.querySelector(".before-image").style.visibility = Number(range.value) === 100 ? "hidden" : "visible";
     gallery.querySelector(".after-layer").style.visibility = Number(range.value) === 0 ? "hidden" : "visible";
     range.setAttribute("aria-valuetext", `${range.value}% transferred`);
-    gallery.querySelector(".label-after").hidden = Number(range.value) < 10;
-    gallery.querySelector(".label-before").hidden = Number(range.value) > 90;
   });
 }
 
