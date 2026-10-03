@@ -14,6 +14,8 @@ h1 { margin: 0; font-size: 46px; font-weight: 700; line-height: 1.2; }
 .subtitle { margin: 12px 0 25px; font-size: 30px; line-height: 1.35; font-weight: 500; }
 .authors { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; color: var(--accent); font-size: 18px; }
 .authors > span { white-space: nowrap; }
+.authors a { text-decoration: none; }
+.authors a:hover, .authors a:focus-visible { text-decoration: underline; }
 .authors sup, .affiliations sup { font-size: 11px; line-height: 0; }
 .affiliations { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; margin-top: 12px; font-size: 15px; color: var(--ink); }
 .hero-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
