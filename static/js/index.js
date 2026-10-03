@@ -154,7 +154,7 @@ function renderTeasers() {
     const outputs = document.createElement("fieldset");
     outputs.className = "teaser-outputs";
     const legend = document.createElement("legend");
-    legend.textContent = "Ours";
+    legend.innerHTML = 'Ours <span class="editable-label"><i class="fas fa-hand-pointer" aria-hidden="true"></i><span>Editable in draw.io</span></span>';
     outputs.appendChild(legend);
     const ratios = document.createElement("div");
     ratios.className = "teaser-ratios";

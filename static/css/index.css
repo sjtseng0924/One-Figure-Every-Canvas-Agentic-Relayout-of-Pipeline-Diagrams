@@ -134,8 +134,8 @@ pre { overflow-x: auto; padding: 24px; background: #f5f6f8; border-radius: 4px; 
 .band-muted { background: #f5f7fa; }
 h2 { text-align: left; font-size: 32px; font-weight: 600; margin-bottom: 18px; }
 .section-heading { text-align: left; max-width: none; }
-.section-heading p { margin: 0; }
-.section-intro { max-width: 880px; margin: 0 0 32px; color: var(--muted); line-height: 1.8; font-size: 15px; }
+.section-heading p { max-width: none; margin: 0; }
+.section-intro { max-width: none; margin: 0 0 32px; color: var(--muted); line-height: 1.8; font-size: 15px; }
 .teaser-block { padding-top: 24px; padding-bottom: 42px; }
 .teaser-block .section-heading, .teaser-block h2 { text-align: center; }
 .teaser-block .section-heading p { margin-left: auto; margin-right: auto; }
@@ -182,7 +182,7 @@ h2 { text-align: left; font-size: 32px; font-weight: 600; margin-bottom: 18px; }
 .method-figure img { width: 100%; height: auto; border: 1px solid #d5dee7; border-radius: 3px; }
 .study-gallery { margin-top: 42px; }
 .study-gallery h3 { margin: 26px 0 9px; font-size: 20px; font-weight: 500; }
-.gallery-description { color: var(--muted); font-size: 14px; max-width: 880px; margin: 0 0 24px; }
+.gallery-description { color: var(--muted); font-size: 14px; max-width: none; margin: 0 0 24px; }
 .figure-comparison { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; }
 .figure-comparison.four-columns { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
 .comparison-figure { margin: 0; min-width: 0; }
@@ -239,7 +239,9 @@ h2 { text-align: left; font-size: 32px; font-weight: 600; margin-bottom: 18px; }
 .teaser-reference { grid-column: 1; grid-row: 1; align-self: center; min-width: 0; padding: 16px 12px; }
 .teaser-outputs { --corner-x: calc((100% - 56px) * .523809524 + 28px); position: relative; grid-area: 1 / 1 / 3 / 3; display: grid; grid-template-columns: 1.1fr 1fr; grid-template-rows: repeat(2, 1fr); gap: 24px 32px; min-width: 0; margin: 0; padding: 24px 12px 16px; border: 0; }
 .teaser-outputs::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#a9b7c3, #a9b7c3) right top / calc(100% - var(--corner-x)) 1px no-repeat, linear-gradient(#a9b7c3, #a9b7c3) right top / 1px 100% no-repeat, linear-gradient(#a9b7c3, #a9b7c3) left bottom / 100% 1px no-repeat, linear-gradient(#a9b7c3, #a9b7c3) left bottom / 1px 50% no-repeat, linear-gradient(#a9b7c3, #a9b7c3) left center / var(--corner-x) 1px no-repeat, linear-gradient(#a9b7c3, #a9b7c3) var(--corner-x) top / 1px 50% no-repeat; }
-.teaser-outputs legend { position: absolute; top: -11px; left: calc(var(--corner-x) + 14px); padding: 0 10px; background: #fff; color: #171717; font-size: 15px; font-weight: 700; }
+.teaser-outputs legend { position: absolute; top: -13px; left: calc(var(--corner-x) + 14px); display: flex; align-items: center; gap: 12px; padding: 0 10px; background: #fff; color: #171717; font-size: 15px; font-weight: 700; }
+.editable-label { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border: 1px solid #d8e0e6; border-radius: 4px; color: #343c43; font-size: 11px; font-weight: 500; line-height: 1.4; white-space: nowrap; }
+.editable-label svg, .editable-label i { color: #2484a4; }
 .teaser-ratios { grid-column: 2; grid-row: 1 / 3; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, 1fr); gap: 24px; min-width: 0; }
 .teaser-wide { grid-column: 1; grid-row: 2; }
 .teaser-figure { min-width: 0; margin: 0; }
@@ -338,6 +340,7 @@ h2 { text-align: left; font-size: 32px; font-weight: 600; margin-bottom: 18px; }
 #ablationGallery img { max-height: 420px; max-width: 100%; width: auto; height: auto; }
 .style-carousel { margin-top: 24px; }
 #style-transfer { padding-left: max(24px, calc((100% - 1280px) / 2)); padding-right: max(24px, calc((100% - 1280px) / 2)); }
+#style-transfer > h2, #style-transfer > .section-intro { max-width: 1100px; margin-left: auto; margin-right: auto; }
 .style-carousel .style-gallery { padding: 0 42px; margin-top: 0; }
 .style-comparison .style-labels { display: grid; grid-template-columns: auto minmax(120px, 1fr) auto; align-items: center; gap: 16px; width: 100%; margin: 0 auto 12px; font-size: 14px; }
 .style-flow-arrow { position: relative; display: block; height: 2px; background: #7b8794; }
