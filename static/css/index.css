@@ -332,7 +332,9 @@ h2 { text-align: left; font-size: 32px; font-weight: 600; margin-bottom: 18px; }
 .style-carousel { margin-top: 24px; }
 #style-transfer { padding-left: max(24px, calc((100% - 1280px) / 2)); padding-right: max(24px, calc((100% - 1280px) / 2)); }
 .style-carousel .style-gallery { padding: 0 42px; margin-top: 0; }
-.style-comparison .style-labels { display: flex; justify-content: space-between; width: 100%; margin: 0 auto 12px; font-size: 14px; }
+.style-comparison .style-labels { display: grid; grid-template-columns: auto minmax(120px, 1fr) auto; align-items: center; gap: 16px; width: 100%; margin: 0 auto 12px; font-size: 14px; }
+.style-flow-arrow { position: relative; display: block; height: 2px; background: #7b8794; }
+.style-flow-arrow::after { content: ""; position: absolute; right: 0; top: 50%; width: 10px; height: 10px; border-top: 2px solid #7b8794; border-right: 2px solid #7b8794; transform: translateY(-50%) rotate(45deg); }
 .style-reference .figure-media { height: 420px; align-items: center; }
 .style-reference figcaption { min-height: 0; margin-bottom: 12px; font-size: 14px; }
 .style-navigation { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 22px; }
@@ -344,6 +346,7 @@ h2 { text-align: left; font-size: 32px; font-weight: 600; margin-bottom: 18px; }
 @media (max-width: 480px) {
   #style-transfer { padding-left: 16px; padding-right: 16px; }
   .before-after { height: 400px; }
+  .style-comparison .style-labels { grid-template-columns: auto minmax(48px, 1fr) auto; gap: 10px; font-size: 12px; }
   .style-reference .figure-media { height: 210px; }
 }
 @media (max-width: 800px) {

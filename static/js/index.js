@@ -597,12 +597,12 @@ function renderStyleTransfer(id = "case1") {
       <div class="figure-media"><img src="static/images/style_transfer/${id}_style_ref.png" alt="Style reference" loading="lazy"></div>
     </figure>
     <figure class="style-comparison">
-      <figcaption class="style-labels"><span>Style Transfer</span><span>Original</span></figcaption>
-      <div class="before-after" style="--reveal: 50%">
+      <figcaption class="style-labels"><span>Original</span><span class="style-flow-arrow" aria-hidden="true"></span><span>Style Transfer</span></figcaption>
+      <div class="before-after" style="--reveal: 8%">
         <img class="before-image" src="${original}" alt="Original diagram" draggable="false">
         <div class="after-layer"><img class="after-image" src="${transferred}" alt="Style-transferred diagram" draggable="false"></div>
         <div class="compare-divider" aria-hidden="true"><span><i class="fas fa-arrows-alt-h"></i></span></div>
-        <input class="compare-range" type="range" min="0" max="100" value="50" aria-label="Reveal transferred style" aria-valuetext="50% transferred">
+        <input class="compare-range" type="range" min="0" max="100" value="8" aria-label="Reveal transferred style" aria-valuetext="8% transferred">
       </div>
     </figure>
   `;
